@@ -25,13 +25,17 @@ import androidx.compose.ui.unit.dp
 import dev.schedler.amortify.domain.model.UsageEntryModel
 import dev.schedler.amortify.presentation.util.DateFormat
 import dev.schedler.amortify.presentation.util.PreviewData
+import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
+import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 @Composable
 fun UsageEntryItem(
     entry: UsageEntryModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -63,7 +67,8 @@ fun UsageEntryItem(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        entry.dateTime.format(DateFormat.default),
+                        entry.dateTime.toLocalDateTime(TimeZone.currentSystemDefault())
+                            .format(DateFormat.default),
                         style = MaterialTheme.typography.bodySmall
                     )
                 }

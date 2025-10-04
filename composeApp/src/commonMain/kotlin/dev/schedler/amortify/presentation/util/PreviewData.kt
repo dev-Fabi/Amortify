@@ -7,26 +7,30 @@ import dev.schedler.amortify.domain.model.UsageEntryModel
 import dev.schedler.amortify.domain.model.UsageTemplate
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import kotlin.time.ExperimentalTime
 
 internal object PreviewData {
+    @OptIn(ExperimentalTime::class)
     val usageEntries = listOf(
         UsageEntryModel(
-            LocalDateTime(2025, 9, 30, 18, 30),
+            LocalDateTime(2025, 9, 30, 18, 30).toInstant(TimeZone.currentSystemDefault()),
             "Graz – Vienna (Train)",
             Money(units = 29, cents = 0)
         ),
         UsageEntryModel(
-            LocalDateTime(2025, 9, 29, 7, 15),
+            LocalDateTime(2025, 9, 29, 7, 15).toInstant(TimeZone.currentSystemDefault()),
             "Morning Swim – 2h Ticket",
             Money(units = 3, cents = 50)
         ),
         UsageEntryModel(
-            LocalDateTime(2025, 9, 25, 19, 0),
+            LocalDateTime(2025, 9, 25, 19, 0).toInstant(TimeZone.currentSystemDefault()),
             "Evening Ticket",
             Money(units = 5, cents = 0)
         ),
         UsageEntryModel(
-            LocalDateTime(2025, 9, 20, 10, 0),
+            LocalDateTime(2025, 9, 20, 10, 0).toInstant(TimeZone.currentSystemDefault()),
             "Museum Entry",
             Money(units = 5, cents = 0)
         )

@@ -1,9 +1,10 @@
 package dev.schedler.amortify.domain.model
 
-import kotlinx.datetime.LocalDateTime
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
-data class UsageEntryModel(
-    val dateTime: LocalDateTime,
+data class UsageEntryModel @OptIn(ExperimentalTime::class) constructor(
+    val dateTime: Instant,
     val description: String,
     val price: Money,
 )

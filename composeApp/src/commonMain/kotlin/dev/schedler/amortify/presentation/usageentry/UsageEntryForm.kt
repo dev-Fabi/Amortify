@@ -23,6 +23,7 @@ import dev.schedler.amortify.domain.model.UsageEntryModel
 import dev.schedler.amortify.presentation.components.DateTimePicker
 import dev.schedler.amortify.presentation.components.MoneyInput
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
@@ -34,7 +35,7 @@ fun UsageEntryForm(
     onSave: (UsageEntryModel) -> Unit
 ) {
     var description by remember { mutableStateOf(model?.description.orEmpty()) }
-    var dateTime by remember { mutableStateOf(model?.dateTime) }
+    var dateTime by remember { mutableStateOf(model?.dateTime ?: Clock.System.now()) }
     var price by remember { mutableStateOf(model?.price) }
 
     Column(
@@ -83,7 +84,8 @@ fun UsageEntryForm(
         )
 
         DateTimePicker(
-            onChange = {}
+            initial = dateTime,
+            onChange = { dateTime = it }
         )
     }
 }
