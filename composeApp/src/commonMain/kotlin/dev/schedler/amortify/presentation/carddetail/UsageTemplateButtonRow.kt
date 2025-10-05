@@ -9,12 +9,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import dev.schedler.amortify.domain.model.UsageTemplate
+import dev.schedler.amortify.domain.model.UsageTemplateModel
 
 @Composable
 fun UsageTemplateButtonRow(
-    templates: List<UsageTemplate>,
-    onQuickAdd: (UsageTemplate) -> Unit,
+    templates: List<UsageTemplateModel>,
+    onQuickAdd: (UsageTemplateModel) -> Unit,
     modifier: Modifier = Modifier
 ) {
     if (templates.isEmpty()) return

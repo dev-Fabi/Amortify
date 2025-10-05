@@ -1,28 +1,34 @@
 package dev.schedler.amortify.presentation.components
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import dev.schedler.amortify.presentation.util.DateFormat
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atTime
 import kotlinx.datetime.format
@@ -68,30 +74,43 @@ fun DateTimePicker(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(24.dp),
     ) {
-        TextButton(
+        OutlinedTextField(
+            value = dateString,
+            onValueChange = {},
             modifier = Modifier.weight(2f),
-            onClick = { showDatePicker = true }
-        ) {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = dateString,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-                textAlign = TextAlign.Start
-            )
-        }
-        TextButton(
+            label = { Text("Date") },
+            readOnly = true,
+            singleLine = true,
+            leadingIcon = {
+                Icon(Icons.Default.CalendarMonth, contentDescription = "Select Date")
+            },
+            interactionSource = remember { MutableInteractionSource() }.also { interactionSource ->
+                LaunchedEffect(interactionSource) {
+                    interactionSource.interactions
+                        .filterIsInstance<PressInteraction.Release>() // Same as onClick
+                        .collect { showDatePicker = true }
+                }
+            }
+        )
+
+        OutlinedTextField(
+            value = timeString,
+            onValueChange = {},
             modifier = Modifier.weight(1f),
-            onClick = { showTimePicker = true },
-        ) {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = timeString,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-                textAlign = TextAlign.End
-            )
-        }
+            label = { Text("Time") },
+            readOnly = true,
+            singleLine = true,
+            trailingIcon = {
+                Icon(Icons.Default.Timer, contentDescription = "Select Time")
+            },
+            interactionSource = remember { MutableInteractionSource() }.also { interactionSource ->
+                LaunchedEffect(interactionSource) {
+                    interactionSource.interactions
+                        .filterIsInstance<PressInteraction.Release>() // Same as onClick
+                        .collect { showTimePicker = true }
+                }
+            }
+        )
     }
 
     if (showDatePicker) {

@@ -24,7 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.schedler.amortify.domain.model.CardModel
 import dev.schedler.amortify.domain.model.UsageEntryModel
-import dev.schedler.amortify.domain.model.UsageTemplate
+import dev.schedler.amortify.domain.model.UsageTemplateModel
 import dev.schedler.amortify.presentation.components.CardItemView
 import dev.schedler.amortify.presentation.usageentry.UsageEntryForm
 import dev.schedler.amortify.presentation.util.PreviewData
@@ -36,13 +36,12 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 fun CardDetailScreen(
     card: CardModel,
     onBack: () -> Unit,
-    onAddUsage: () -> Unit,
-    onAddUsageFromTemplate: (UsageTemplate) -> Unit,
+    onSaveUsage: (UsageEntryModel) -> Unit,
+    onAddUsageFromTemplate: (UsageTemplateModel) -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
-    var showSheet by remember { mutableStateOf(false) }
-    var editUsageModel by remember { mutableStateOf<UsageEntryModel?>(null) }
+    var sheetConfig by remember { mutableStateOf<SheetConfig?>(null) }
 
     Scaffold(
         topBar = {
@@ -59,7 +58,7 @@ fun CardDetailScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { showSheet = true }) {
+            FloatingActionButton(onClick = { sheetConfig = SheetConfig.NewUsage }) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add Usage")
             }
         }
@@ -84,44 +83,32 @@ fun CardDetailScreen(
             UsageEntryList(
                 modifier = Modifier.padding(top = 12.dp),
                 entries = card.usages,
-                onClick = {
-                    editUsageModel = it
-                    showSheet = true
-                }
+                onClick = { sheetConfig = SheetConfig.EditUsage(it) }
             )
         }
 
-        if (showSheet) {
+        if (sheetConfig != null) {
             ModalBottomSheet(
-                onDismissRequest = {
-                    editUsageModel = null
-                    showSheet = false
-                },
+                onDismissRequest = { sheetConfig = null },
                 sheetState = sheetState,
                 dragHandle = null
             ) {
                 UsageEntryForm(
                     modifier = Modifier.padding(16.dp),
-                    model = editUsageModel,
+                    model = (sheetConfig as? SheetConfig.EditUsage)?.model,
                     onCancel = {
                         coroutineScope.launch {
                             sheetState.hide()
                         }.invokeOnCompletion {
-                            if (!sheetState.isVisible) {
-                                editUsageModel = null
-                                showSheet = false
-                            }
+                            if (!sheetState.isVisible) sheetConfig = null
                         }
                     },
-                    onSave = { it ->
-                        onAddUsage()
+                    onSave = {
+                        onSaveUsage(it)
                         coroutineScope.launch {
                             sheetState.hide()
                         }.invokeOnCompletion {
-                            if (!sheetState.isVisible) {
-                                editUsageModel = null
-                                showSheet = false
-                            }
+                            if (!sheetState.isVisible) sheetConfig = null
                         }
                     }
                 )
@@ -130,13 +117,18 @@ fun CardDetailScreen(
     }
 }
 
+private sealed interface SheetConfig {
+    object NewUsage : SheetConfig
+    data class EditUsage(val model: UsageEntryModel) : SheetConfig
+}
+
 @Composable
 @Preview(showBackground = true)
 private fun PreviewCardDetailScreen() {
     CardDetailScreen(
         card = PreviewData.gymCard,
         onBack = {},
-        onAddUsage = {},
+        onSaveUsage = {},
         onAddUsageFromTemplate = {}
     )
 }

@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -45,8 +46,9 @@ fun CardItemView(
     onClick: (() -> Unit)?,
     onAddUsage: (() -> Unit)?
 ) {
+    val shape = RoundedCornerShape(16.dp)
     val cardModifier = if (onClick != null) {
-        Modifier.clickable(onClick = onClick)
+        Modifier.clip(shape).clickable(onClick = onClick)
     } else {
         Modifier
     }
@@ -58,9 +60,9 @@ fun CardItemView(
                 brush = Brush.horizontalGradient(
                     colors = listOf(card.baseColor.darken(0.85f), card.baseColor)
                 ),
-                shape = RoundedCornerShape(16.dp),
+                shape = shape,
             ),
-        shape = RoundedCornerShape(16.dp),
+        shape = shape,
         colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
         Column(
