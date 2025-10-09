@@ -1,7 +1,7 @@
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
+
 package dev.schedler.amortify.presentation.components
 
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -16,7 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,8 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.schedler.amortify.presentation.util.DateFormat
-import dev.schedler.amortify.presentation.util.now
-import kotlinx.coroutines.flow.filterIsInstance
+import dev.schedler.amortify.presentation.util.rememberClickableInteractionSource
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
@@ -37,38 +37,16 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
 @Composable
 fun DateRangePicker(
     modifier: Modifier = Modifier,
-    initialStart: LocalDate = LocalDate.now(),
-    initialEnd: LocalDate = LocalDate.now(),
+    state: DateRangePickerState = rememberDateRangePickerState(),
     label: @Composable () -> Unit,
-    onChange: (Pair<LocalDate, LocalDate>) -> Unit,
 ) {
-    var showDatePicker by remember { mutableStateOf(0) }
+    var showDatePicker by remember { mutableStateOf(PickerType.None) }
 
-    val startDatePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = initialStart.atStartOfDayIn(TimeZone.UTC).toEpochMilliseconds()
-    )
-    val startDateString by derivedStateOf {
-        startDatePickerState.selectedDateMillis?.let {
-            Instant.fromEpochMilliseconds(it)
-                .toLocalDateTime(TimeZone.currentSystemDefault())
-                .format(DateFormat.dateOnly)
-        } ?: ""
-    }
-
-    val endDatePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = initialEnd.atStartOfDayIn(TimeZone.UTC).toEpochMilliseconds()
-    )
-    val endDateString by derivedStateOf {
-        endDatePickerState.selectedDateMillis?.let {
-            Instant.fromEpochMilliseconds(it)
-                .toLocalDateTime(TimeZone.currentSystemDefault())
-                .format(DateFormat.dateOnly)
-        } ?: ""
-    }
+    val startDateString = state.range.first?.format(DateFormat.date).orEmpty()
+    val endDateString = state.range.second?.format(DateFormat.date).orEmpty()
 
     Column {
         label()
@@ -87,12 +65,8 @@ fun DateRangePicker(
                 leadingIcon = {
                     Icon(Icons.Default.CalendarMonth, contentDescription = "Select Start Date")
                 },
-                interactionSource = remember { MutableInteractionSource() }.also { interactionSource ->
-                    LaunchedEffect(interactionSource) {
-                        interactionSource.interactions
-                            .filterIsInstance<PressInteraction.Release>() // Same as onClick
-                            .collect { showDatePicker = 1 }
-                    }
+                interactionSource = rememberClickableInteractionSource {
+                    showDatePicker = PickerType.Start
                 }
             )
 
@@ -105,50 +79,76 @@ fun DateRangePicker(
                 label = { Text("End") },
                 readOnly = true,
                 singleLine = true,
+                isError = state.isSet() && !state.isValid(),
                 trailingIcon = {
                     Icon(Icons.Default.CalendarMonth, contentDescription = "Select End Date")
                 },
-                interactionSource = remember { MutableInteractionSource() }.also { interactionSource ->
-                    LaunchedEffect(interactionSource) {
-                        interactionSource.interactions
-                            .filterIsInstance<PressInteraction.Release>() // Same as onClick
-                            .collect { showDatePicker = 2 }
-                    }
+                interactionSource = rememberClickableInteractionSource {
+                    showDatePicker = PickerType.End
                 }
             )
         }
     }
 
-    if (showDatePicker != 0) {
+    if (showDatePicker != PickerType.None) {
         DatePickerDialog(
-            onDismissRequest = { showDatePicker = 0 },
+            onDismissRequest = { showDatePicker = PickerType.None },
             confirmButton = {
-                TextButton(onClick = {
-                    showDatePicker = 0
-
-                    val start = startDatePickerState.selectedDateMillis
-                        ?.let(Instant::fromEpochMilliseconds)
-                        ?.toLocalDateTime(TimeZone.currentSystemDefault())
-                        ?.date
-                        ?: return@TextButton
-
-                    val end = endDatePickerState.selectedDateMillis
-                        ?.let(Instant::fromEpochMilliseconds)
-                        ?.toLocalDateTime(TimeZone.currentSystemDefault())
-                        ?.date
-                        ?: return@TextButton
-
-                    onChange(start to end)
-                }) { Text("OK") }
+                TextButton(onClick = { showDatePicker = PickerType.None }) { Text("OK") }
             },
             dismissButton = {
-                TextButton(onClick = { showDatePicker = 0 }) { Text("Cancel") }
+                TextButton(onClick = { showDatePicker = PickerType.None }) { Text("Cancel") }
             }
         ) {
-            DatePicker(state = if (showDatePicker == 1) startDatePickerState else endDatePickerState)
+            DatePicker(state = if (showDatePicker == PickerType.Start) state.start else state.end)
         }
     }
 }
+
+@Composable
+fun rememberDateRangePickerState(
+    initialStart: LocalDate? = null,
+    initialEnd: LocalDate? = null,
+    timeZone: TimeZone = TimeZone.currentSystemDefault(),
+): DateRangePickerState {
+    val startState = rememberDatePickerState(
+        initialSelectedDateMillis = initialStart?.atStartOfDayIn(TimeZone.UTC)
+            ?.toEpochMilliseconds()
+    )
+    val endState = rememberDatePickerState(
+        initialSelectedDateMillis = initialEnd?.atStartOfDayIn(TimeZone.UTC)
+            ?.toEpochMilliseconds()
+    )
+
+    return remember(startState, endState, timeZone) {
+        DateRangePickerState(startState, endState, timeZone)
+    }
+}
+
+@Stable
+class DateRangePickerState(
+    val start: DatePickerState,
+    val end: DatePickerState,
+    private val timeZone: TimeZone
+) {
+    val range: Pair<LocalDate?, LocalDate?> by derivedStateOf {
+        start.toLocalDate(timeZone) to end.toLocalDate(timeZone)
+    }
+
+    fun isSet(): Boolean = start.selectedDateMillis != null && end.selectedDateMillis != null
+    fun isValid(): Boolean = start.selectedDateMillis?.let { start ->
+        end.selectedDateMillis?.let { end -> start < end }
+    } == true
+
+    companion object {
+        private fun DatePickerState.toLocalDate(timeZone: TimeZone): LocalDate? = selectedDateMillis
+            ?.let(Instant::fromEpochMilliseconds)
+            ?.toLocalDateTime(timeZone)
+            ?.date
+    }
+}
+
+private enum class PickerType { None, Start, End }
 
 @OptIn(ExperimentalTime::class)
 @Composable
@@ -156,6 +156,5 @@ fun DateRangePicker(
 private fun PreviewDateRangePicker() {
     DateRangePicker(
         label = { Text("Validity Period") },
-        onChange = {}
     )
 }

@@ -26,6 +26,20 @@ object DateFormat {
         year()
     }
 
+    val timeOnly = LocalDateTime.Format {
+        hour()
+        char(':')
+        minute()
+    }
+
+    val date = LocalDate.Format {
+        day()
+        char('.')
+        monthNumber()
+        char('.')
+        year()
+    }
+
     fun fromTo(from: LocalDate, to: LocalDate): String {
         val dateFormat = LocalDate.Format {
             day()

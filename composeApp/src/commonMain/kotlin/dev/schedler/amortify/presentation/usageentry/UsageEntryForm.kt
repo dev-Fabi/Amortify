@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
@@ -13,15 +15,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.schedler.amortify.domain.model.UsageEntryModel
 import dev.schedler.amortify.presentation.components.DateTimePicker
 import dev.schedler.amortify.presentation.components.MoneyInput
+import dev.schedler.amortify.presentation.components.rememberDateTimePickerState
+import dev.schedler.amortify.presentation.components.rememberMoneyInputState
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -34,9 +34,9 @@ fun UsageEntryForm(
     onCancel: () -> Unit,
     onSave: (UsageEntryModel) -> Unit
 ) {
-    var description by remember { mutableStateOf(model?.description.orEmpty()) }
-    var dateTime by remember { mutableStateOf(model?.dateTime ?: Clock.System.now()) }
-    var price by remember { mutableStateOf(model?.price) }
+    val dateTime = rememberDateTimePickerState(model?.dateTime ?: Clock.System.now())
+    val price = rememberMoneyInputState(model?.price)
+    val descriptionState = rememberTextFieldState(model?.description.orEmpty())
 
     Column(
         modifier = modifier,
@@ -51,14 +51,16 @@ fun UsageEntryForm(
             }
 
             Button(
-                enabled = description.isNotBlank() && dateTime != null && price != null,
+                enabled = descriptionState.text.isNotBlank() && price.isSet() && dateTime.isSet(),
                 onClick = {
-                    if (description.isNotBlank() && dateTime != null && price != null) {
+                    val money = price.money
+                    val instant = dateTime.instant
+                    if (descriptionState.text.isNotBlank() && money != null && instant != null) {
                         onSave(
                             UsageEntryModel(
-                                dateTime = dateTime!!,
-                                description = description,
-                                price = price!!
+                                dateTime = instant,
+                                description = descriptionState.text.toString(),
+                                price = money
                             )
                         )
                     }
@@ -70,23 +72,18 @@ fun UsageEntryForm(
 
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
-            value = description,
-            onValueChange = { description = it },
+            state = descriptionState,
             label = { Text("Description") },
-            singleLine = true
+            lineLimits = TextFieldLineLimits.SingleLine
         )
 
         MoneyInput(
             modifier = Modifier.fillMaxWidth(),
-            initial = model?.price,
-            onValueChange = { price = it },
+            state = price,
             label = { Text("Price") },
         )
 
-        DateTimePicker(
-            initial = dateTime,
-            onChange = { dateTime = it }
-        )
+        DateTimePicker(state = dateTime)
     }
 }
 

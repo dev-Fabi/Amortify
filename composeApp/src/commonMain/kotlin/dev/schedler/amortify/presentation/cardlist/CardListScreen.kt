@@ -22,6 +22,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.schedler.amortify.domain.model.CardModel
+import dev.schedler.amortify.domain.model.ISimpleCard
+import dev.schedler.amortify.domain.model.SimpleCardModel
 import dev.schedler.amortify.presentation.components.CardItemView
 import dev.schedler.amortify.presentation.util.PreviewData
 import kotlinx.coroutines.launch
@@ -31,7 +33,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 fun CardListScreen(
     cards: List<CardModel>,
-    onSave: (CardModel) -> Unit,
+    onSave: (SimpleCardModel) -> Unit,
     onClick: (CardModel) -> Unit,
     onAddUsage: (CardModel) -> Unit
 ) {
@@ -95,7 +97,7 @@ fun CardListScreen(
 
 private sealed interface SheetConfig {
     object NewCard : SheetConfig
-    class EditCard(val model: CardModel) : SheetConfig
+    class EditCard(val model: ISimpleCard) : SheetConfig
 }
 
 @Composable
