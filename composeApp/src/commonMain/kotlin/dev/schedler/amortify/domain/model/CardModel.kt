@@ -2,9 +2,10 @@ package dev.schedler.amortify.domain.model
 
 import androidx.compose.ui.graphics.Color
 import kotlinx.datetime.LocalDate
+import kotlin.uuid.Uuid
 
 data class CardModel(
-    override val id: Long? = null, // null if not persisted yet
+    override val id: Uuid? = null, // null if not persisted yet
     override val name: String,
     override val price: Money,
     override val start: LocalDate,
@@ -18,7 +19,7 @@ data class CardModel(
 }
 
 data class SimpleCardModel(
-    override val id: Long? = null, // null if not persisted yet
+    override val id: Uuid? = null, // null if not persisted yet
     override val name: String,
     override val price: Money,
     override val start: LocalDate,
@@ -27,7 +28,7 @@ data class SimpleCardModel(
 ) : ISimpleCard
 
 interface ISimpleCard {
-    val id: Long? // null if not persisted yet
+    val id: Uuid? // null if not persisted yet
     val name: String
     val price: Money
     val start: LocalDate

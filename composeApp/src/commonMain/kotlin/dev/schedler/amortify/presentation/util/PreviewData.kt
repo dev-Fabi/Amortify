@@ -9,31 +9,30 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
-import kotlin.time.ExperimentalTime
+import kotlin.uuid.Uuid
 
 internal object PreviewData {
-    @OptIn(ExperimentalTime::class)
     val usageEntries = listOf(
         UsageEntryModel(
-            id = 1,
+            id = Uuid.random(),
             LocalDateTime(2025, 9, 30, 18, 30).toInstant(TimeZone.currentSystemDefault()),
             "Graz – Vienna (Train)",
             Money(units = 29, cents = 0)
         ),
         UsageEntryModel(
-            id = 2,
+            id = Uuid.random(),
             LocalDateTime(2025, 9, 29, 7, 15).toInstant(TimeZone.currentSystemDefault()),
             "Morning Swim – 2h Ticket",
             Money(units = 3, cents = 50)
         ),
         UsageEntryModel(
-            id = 3,
+            id = Uuid.random(),
             LocalDateTime(2025, 9, 25, 19, 0).toInstant(TimeZone.currentSystemDefault()),
             "Evening Ticket",
             Money(units = 5, cents = 0)
         ),
         UsageEntryModel(
-            id = 4,
+            id = Uuid.random(),
             LocalDateTime(2025, 9, 20, 10, 0).toInstant(TimeZone.currentSystemDefault()),
             "Museum Entry",
             Money(units = 5, cents = 0)
@@ -41,13 +40,13 @@ internal object PreviewData {
     )
 
     val usageTemplates = listOf(
-        UsageTemplateModel(id = 1, "2h Ticket", Money(units = 3, cents = 50)),
-        UsageTemplateModel(id = 2, "Evening Ticket", Money(units = 5, cents = 0)),
-        UsageTemplateModel(id = 3, "Graz – Vienna", Money(units = 29, cents = 0))
+        UsageTemplateModel(id = Uuid.random(), "2h Ticket", Money(units = 3, cents = 50)),
+        UsageTemplateModel(id = Uuid.random(), "Evening Ticket", Money(units = 5, cents = 0)),
+        UsageTemplateModel(id = Uuid.random(), "Graz – Vienna", Money(units = 29, cents = 0))
     )
 
     val gymCard = CardModel(
-        id = 1,
+        id = Uuid.random(),
         "Gym year pass",
         Money(units = 59 * 12, cents = 99 * 12),
         LocalDate(2025, 1, 1),
@@ -58,7 +57,7 @@ internal object PreviewData {
     )
 
     val poolCard = CardModel(
-        id = 2,
+        id = Uuid.random(),
         "Swimming season ticket",
         Money(units = 305, cents = 50),
         LocalDate(2025, 5, 1),
@@ -69,7 +68,7 @@ internal object PreviewData {
     )
 
     val skiPass = CardModel(
-        id = 3,
+        id = Uuid.random(),
         "Skipass Winter 2025",
         Money(units = 899, cents = 99),
         LocalDate(2025, 12, 1),
@@ -80,7 +79,7 @@ internal object PreviewData {
     )
 
     val transportCard = CardModel(
-        id = 4,
+        id = Uuid.random(),
         "Climate ticket Austria",
         Money(units = 1050, cents = 0),
         LocalDate(2025, 7, 1),
@@ -91,7 +90,7 @@ internal object PreviewData {
     )
 
     val boulderCard = CardModel(
-        id = 5,
+        id = Uuid.random(),
         "Bouldering 25/26WS",
         Money(units = 280, cents = 0),
         LocalDate(2025, 10, 1),

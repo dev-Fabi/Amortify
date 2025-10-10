@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
+@file:OptIn(ExperimentalMaterial3Api::class)
 
 package dev.schedler.amortify.presentation.components
 
@@ -34,7 +34,6 @@ import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.format
 import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 @Composable
@@ -150,7 +149,6 @@ class DateRangePickerState(
 
 private enum class PickerType { None, Start, End }
 
-@OptIn(ExperimentalTime::class)
 @Composable
 @Preview(showBackground = true)
 private fun PreviewDateRangePicker() {

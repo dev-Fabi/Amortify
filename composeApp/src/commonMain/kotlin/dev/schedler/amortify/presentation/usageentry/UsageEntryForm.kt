@@ -24,9 +24,8 @@ import dev.schedler.amortify.presentation.components.rememberDateTimePickerState
 import dev.schedler.amortify.presentation.components.rememberMoneyInputState
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UsageEntryForm(
     modifier: Modifier = Modifier,
