@@ -18,7 +18,7 @@ fun CardEntity.toDomain(
     price = price,
     start = startDate,
     end = endDate,
-    baseColor = Color(baseColor),
+    baseColor = Color(baseColor.toULong()),
     usages = usages,
     usageTemplates = templates
 )

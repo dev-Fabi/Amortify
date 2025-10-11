@@ -1,4 +1,4 @@
-package dev.schedler.amortify.data.local.repository
+package dev.schedler.amortify.data.repository
 
 import dev.schedler.amortify.data.local.dao.CardDao
 import dev.schedler.amortify.data.local.mapper.toDomain
@@ -27,6 +27,9 @@ class CardRepositoryImpl(
     }
 
     override suspend fun updateCard(card: SimpleCardModel) {
+        if (card.id == null) {
+            throw IllegalArgumentException("Card ID must not be null when updating a card.")
+        }
         cardDao.updateCard(card.toEntity())
     }
 
