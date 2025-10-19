@@ -27,12 +27,17 @@ import androidx.compose.ui.unit.dp
 import dev.schedler.amortify.domain.model.CardModel
 import dev.schedler.amortify.domain.model.ISimpleCard
 import dev.schedler.amortify.domain.model.SimpleCardModel
+import dev.schedler.amortify.domain.model.UsageEntryModel
+import dev.schedler.amortify.domain.model.UsageTemplateModel
 import dev.schedler.amortify.presentation.components.CardItemView
+import dev.schedler.amortify.presentation.usageentry.UsageEntryForm
 import dev.schedler.amortify.presentation.util.PreviewData
 import dev.schedler.amortify.presentation.util.Resource
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import kotlin.time.Clock
+import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -40,7 +45,7 @@ fun CardListScreen(
     cards: Resource<List<CardModel>>,
     onSave: (SimpleCardModel) -> Unit,
     onClick: (CardModel) -> Unit,
-    onAddUsage: (CardModel) -> Unit
+    onAddUsage: (cardId: Uuid, usage: UsageEntryModel) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
@@ -78,7 +83,9 @@ fun CardListScreen(
                                 showPercentage = false,
                                 onEdit = { sheetConfig = SheetConfig.EditCard(card) },
                                 onClick = { onClick(card) },
-                                onAddUsage = { onAddUsage(card) },
+                                onAddUsage = { template ->
+                                    sheetConfig = SheetConfig.AddUsage(card, template)
+                                },
                             )
                         }
                     }
@@ -90,25 +97,60 @@ fun CardListScreen(
                         sheetState = sheetState,
                         dragHandle = null
                     ) {
-                        CardForm(
-                            modifier = Modifier.padding(16.dp),
-                            model = (sheetConfig as? SheetConfig.EditCard)?.model,
-                            onCancel = {
-                                coroutineScope.launch {
-                                    sheetState.hide()
-                                }.invokeOnCompletion {
-                                    if (!sheetState.isVisible) sheetConfig = null
+                        when (val config = sheetConfig) {
+                            is SheetConfig.NewCard, is SheetConfig.EditCard -> CardForm(
+                                modifier = Modifier.padding(16.dp),
+                                model = (config as? SheetConfig.EditCard)?.model,
+                                onCancel = {
+                                    coroutineScope.launch {
+                                        sheetState.hide()
+                                    }.invokeOnCompletion {
+                                        if (!sheetState.isVisible) sheetConfig = null
+                                    }
+                                },
+                                onSave = {
+                                    onSave(it)
+                                    coroutineScope.launch {
+                                        sheetState.hide()
+                                    }.invokeOnCompletion {
+                                        if (!sheetState.isVisible) sheetConfig = null
+                                    }
                                 }
-                            },
-                            onSave = {
-                                onSave(it)
-                                coroutineScope.launch {
-                                    sheetState.hide()
-                                }.invokeOnCompletion {
-                                    if (!sheetState.isVisible) sheetConfig = null
-                                }
+                            )
+
+                            is SheetConfig.AddUsage -> {
+                                UsageEntryForm(
+                                    modifier = Modifier.padding(16.dp),
+                                    model = if (config.template != null) {
+                                        UsageEntryModel(
+                                            dateTime = Clock.System.now(),
+                                            description = config.template.description,
+                                            price = config.template.price
+                                        )
+                                    } else {
+                                        null
+                                    },
+                                    onCancel = {
+                                        coroutineScope.launch {
+                                            sheetState.hide()
+                                        }.invokeOnCompletion {
+                                            if (!sheetState.isVisible) sheetConfig = null
+                                        }
+                                    },
+                                    onSave = {
+                                        val cardId = config.card.id ?: return@UsageEntryForm
+                                        onAddUsage(cardId, it)
+                                        coroutineScope.launch {
+                                            sheetState.hide()
+                                        }.invokeOnCompletion {
+                                            if (!sheetState.isVisible) sheetConfig = null
+                                        }
+                                    }
+                                )
                             }
-                        )
+
+                            null -> Unit
+                        }
                     }
                 }
             }
@@ -119,6 +161,7 @@ fun CardListScreen(
 private sealed interface SheetConfig {
     object NewCard : SheetConfig
     class EditCard(val model: ISimpleCard) : SheetConfig
+    class AddUsage(val card: ISimpleCard, val template: UsageTemplateModel?) : SheetConfig
 }
 
 @Composable
@@ -136,6 +179,6 @@ private fun CardListScreenPreview() {
         ),
         onSave = {},
         onClick = {},
-        onAddUsage = {}
+        onAddUsage = { _, _ -> }
     )
 }

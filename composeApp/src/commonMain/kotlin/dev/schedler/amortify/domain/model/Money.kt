@@ -1,5 +1,6 @@
 package dev.schedler.amortify.domain.model
 
+import dev.schedler.amortify.util.LocalizationUtils
 import kotlin.jvm.JvmInline
 import kotlin.math.absoluteValue
 
@@ -16,7 +17,8 @@ value class Money(val cents: Long) {
         return Money(cents - other.cents)
     }
 
-    override fun toString(): String = toString(decimalSeparator = '.')
+    override fun toString(): String =
+        toString(decimalSeparator = LocalizationUtils.decimalSeparator)
 
     fun toString(decimalSeparator: Char): String {
         val units = cents.absoluteValue / 100

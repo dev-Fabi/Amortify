@@ -12,12 +12,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -33,18 +31,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.schedler.amortify.domain.model.CardModel
+import dev.schedler.amortify.domain.model.UsageTemplateModel
 import dev.schedler.amortify.presentation.util.DateFormat
 import dev.schedler.amortify.presentation.util.PreviewData
 import dev.schedler.amortify.presentation.util.darken
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun CardItemView(
     card: CardModel,
     showPercentage: Boolean,
     onEdit: () -> Unit,
     onClick: (() -> Unit)?,
-    onAddUsage: (() -> Unit)?
+    onAddUsage: ((UsageTemplateModel?) -> Unit)?
 ) {
     val shape = RoundedCornerShape(16.dp)
     val cardModifier = if (onClick != null) {
@@ -136,19 +136,10 @@ fun CardItemView(
 
                 if (onAddUsage != null) {
                     Spacer(Modifier.width(16.dp))
-
-                    Button(
-                        onClick = onAddUsage,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.White)
-                    ) {
-                        Icon(
-                            Icons.Default.Add,
-                            contentDescription = "Add Entry",
-                            tint = Color.Black
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Entry", color = Color.Black)
-                    }
+                    AddUsageButton(
+                        templates = card.usageTemplates,
+                        onAddUsage = onAddUsage
+                    )
                 }
             }
         }
