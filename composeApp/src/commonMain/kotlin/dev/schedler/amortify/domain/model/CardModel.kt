@@ -5,7 +5,7 @@ import kotlinx.datetime.LocalDate
 import kotlin.uuid.Uuid
 
 data class CardModel(
-    override val id: Uuid? = null, // null if not persisted yet
+    override val id: Uuid?, // null if not persisted yet
     override val name: String,
     override val price: Money,
     override val start: LocalDate,
@@ -19,7 +19,7 @@ data class CardModel(
 }
 
 data class SimpleCardModel(
-    override val id: Uuid? = null, // null if not persisted yet
+    override val id: Uuid?, // null if not persisted yet
     override val name: String,
     override val price: Money,
     override val start: LocalDate,

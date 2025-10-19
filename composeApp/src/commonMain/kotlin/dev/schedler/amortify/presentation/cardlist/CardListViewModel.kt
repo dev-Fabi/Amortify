@@ -48,29 +48,25 @@ class CardListViewModel(
 
     fun addUsageEntry(cardId: Uuid, usage: UsageEntryModel) {
         viewModelScope.launch {
-            runCatching { usageEntryRepository.insert(cardId, usage) }
-            //.onFailure { e -> /* Handle error if needed */ }
+            usageEntryRepository.insert(cardId, usage)
         }
     }
 
     private fun addCard(card: SimpleCardModel) {
         viewModelScope.launch {
-            runCatching { cardRepository.insertCard(card) }
-            //.onFailure { e -> _cards.value = Resource.Error("Failed to add card", e) }
+            cardRepository.insertCard(card)
         }
     }
 
     private fun updateCard(card: SimpleCardModel) {
         viewModelScope.launch {
-            runCatching { cardRepository.updateCard(card) }
-            //.onFailure { e -> _cards.value = Resource.Error("Failed to update card", e) }
+            cardRepository.updateCard(card)
         }
     }
 
     fun deleteCard(id: Uuid) {
         viewModelScope.launch {
-            runCatching { cardRepository.deleteCard(id) }
-            //.onFailure { e -> _cards.value = Result.Error("Failed to delete card", e) }
+            cardRepository.deleteCard(id)
         }
     }
 }

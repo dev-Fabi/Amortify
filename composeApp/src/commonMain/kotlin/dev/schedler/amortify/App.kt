@@ -1,17 +1,11 @@
 package dev.schedler.amortify
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -22,6 +16,8 @@ import dev.schedler.amortify.data.local.db.AmortifyDatabase
 import dev.schedler.amortify.di.databaseModule
 import dev.schedler.amortify.di.repositoryModule
 import dev.schedler.amortify.di.viewModelModule
+import dev.schedler.amortify.presentation.carddetail.CardDetailScreen
+import dev.schedler.amortify.presentation.carddetail.CardDetailViewModel
 import dev.schedler.amortify.presentation.cardlist.CardListScreen
 import dev.schedler.amortify.presentation.cardlist.CardListViewModel
 import dev.schedler.amortify.presentation.navigation.Screen
@@ -30,6 +26,7 @@ import dev.schedler.amortify.presentation.util.Resource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinApplication
 import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 import kotlin.reflect.typeOf
 import kotlin.uuid.Uuid
 
@@ -68,15 +65,13 @@ fun App(databaseBuilder: RoomDatabase.Builder<AmortifyDatabase>) {
                     typeMap = mapOf(typeOf<Uuid>() to UuidNavType())
                 ) { backStackEntry ->
                     val screen: Screen.CardDetail = backStackEntry.toRoute()
+                    val vm: CardDetailViewModel = koinViewModel { parametersOf(screen.cardId) }
 
-                    Scaffold { paddingValues ->
-                        Column(modifier = Modifier.padding(paddingValues)) {
-                            Text("Card Detail ${screen.cardId}")
-                            Button(onClick = { navController.popBackStack() }) {
-                                Text("Go Back")
-                            }
-                        }
-                    }
+                    CardDetailScreen(
+                        card = vm.card.collectAsStateWithLifecycle(Resource.Loading).value,
+                        onSaveUsage = vm::saveUsage,
+                        onBack = { navController.popBackStack() },
+                    )
                 }
             }
         }

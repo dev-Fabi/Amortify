@@ -57,6 +57,7 @@ fun UsageEntryForm(
                     if (descriptionState.text.isNotBlank() && money != null && instant != null) {
                         onSave(
                             UsageEntryModel(
+                                id = model?.id,
                                 dateTime = instant,
                                 description = descriptionState.text.toString(),
                                 price = money

@@ -36,7 +36,6 @@ import dev.schedler.amortify.presentation.util.Resource
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import kotlin.time.Clock
 import kotlin.uuid.Uuid
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -122,11 +121,7 @@ fun CardListScreen(
                                 UsageEntryForm(
                                     modifier = Modifier.padding(16.dp),
                                     model = if (config.template != null) {
-                                        UsageEntryModel(
-                                            dateTime = Clock.System.now(),
-                                            description = config.template.description,
-                                            price = config.template.price
-                                        )
+                                        UsageEntryModel.fromTemplate(config.template)
                                     } else {
                                         null
                                     },

@@ -80,6 +80,9 @@ kotlin {
                 implementation(libs.kotlinx.coroutinesSwing)
             }
         }
+        all {
+            languageSettings.enableLanguageFeature("WhenGuards")
+        }
     }
 }
 
