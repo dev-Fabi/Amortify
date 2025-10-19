@@ -18,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import dev.schedler.amortify.domain.model.ISimpleCard
 import dev.schedler.amortify.domain.model.SimpleCardModel
@@ -98,7 +99,30 @@ fun CardForm(
         ColorPickerInput(
             modifier = Modifier.fillMaxWidth(),
             state = baseColor,
-            availableColors = emptyList(),
+            availableColors = listOf(
+                // Warm / Light
+                Color(0xFFFFF5E1), // SoftSand
+                Color(0xFFFFF3CF), // WarmCream
+                Color(0xFFFFEEDB), // PaleApricot
+                Color(0xFFFFEAD5), // SoftPeach
+                Color(0xFFFFD699), // DeepWarmBeige
+
+                // Cool / Gray
+                Color(0xFFF2F2F2), // Mist
+                Color(0xFFE0E0E0), // CoolGray
+                Color(0xFFB0BEC5), // MistyGray
+                Color(0xFFD9BFA0), // DarkSand
+                Color(0xFFA1887F), // Cocoa
+
+                // Teal / Cyan / Green
+                Color(0xFFC8EAE5), // SoftMint
+                Color(0xFFBEEAE6), // PaleCyan
+                Color(0xFFD0F0F0), // LightAqua
+                Color(0xFF4DB6AC), // SlateTeal
+                Color(0xFF388E8E), // TealGray
+                Color(0xFF2E7D7D), // OliveTeal
+                Color(0xFF009688), // DeepCyan
+            ),
         )
 
         DateRangePicker(

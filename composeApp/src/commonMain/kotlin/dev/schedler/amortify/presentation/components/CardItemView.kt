@@ -18,15 +18,17 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -115,14 +117,23 @@ fun CardItemView(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    LinearProgressIndicator(
-                        progress = { card.progress },
+                    val indicatorColor by derivedStateOf {
+                        val clampedProgress = card.progress.coerceIn(0f, 1f)
+                        lerp(Color.Red, Color.Green, clampedProgress)
+                    }
+                    GradientProgressIndicator(
+                        progress = card.progress,
                         modifier = Modifier
                             .height(8.dp)
                             .fillMaxWidth(),
-                        color = Color.Yellow,
                         trackColor = Color.White.copy(alpha = 0.3f),
                         strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
+                        colors = listOf(
+                            // Use a gradient that is also distinguishable for colorblind users
+                            Color(0xFFD32F2F), // amber
+                            Color(0xFFFF9800), // orange
+                            Color(0xFF4DB6AC)  // teal
+                        )
                     )
 
                     if (showPercentage) {
