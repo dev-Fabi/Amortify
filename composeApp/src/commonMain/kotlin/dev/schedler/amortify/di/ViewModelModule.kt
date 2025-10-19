@@ -9,6 +9,11 @@ import kotlin.uuid.Uuid
 val viewModelModule = module {
     viewModel { CardListViewModel(cardRepository = get(), usageEntryRepository = get()) }
     viewModel { (cardId: Uuid) ->
-        CardDetailViewModel(cardId, cardRepository = get(), usageEntryRepository = get())
+        CardDetailViewModel(
+            cardId = cardId,
+            cardRepository = get(),
+            usageEntryRepository = get(),
+            usageTemplateRepository = get()
+        )
     }
 }

@@ -69,8 +69,10 @@ fun App(databaseBuilder: RoomDatabase.Builder<AmortifyDatabase>) {
 
                     CardDetailScreen(
                         card = vm.card.collectAsStateWithLifecycle(Resource.Loading).value,
-                        onSaveUsage = vm::saveUsage,
                         onBack = { navController.popBackStack() },
+                        onSaveUsage = vm::saveUsage,
+                        onDeleteUsage = { if (it.id != null) vm.deleteUsage(it.id) },
+                        onSaveUsageAsTemplate = vm::saveUsageAsTemplate
                     )
                 }
             }

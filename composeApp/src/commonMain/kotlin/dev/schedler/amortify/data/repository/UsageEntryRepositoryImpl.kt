@@ -25,6 +25,9 @@ class UsageEntryRepositoryImpl(
     }
 
     override suspend fun update(cardId: Uuid, usage: UsageEntryModel) {
+        if (usage.id == null) {
+            throw IllegalArgumentException("UsageEntry ID must not be null when updating.")
+        }
         usageEntryDao.update(usage.toEntity(cardId))
     }
 

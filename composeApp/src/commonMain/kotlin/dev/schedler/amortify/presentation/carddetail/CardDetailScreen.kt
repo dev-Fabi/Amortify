@@ -41,6 +41,8 @@ fun CardDetailScreen(
     card: Resource<CardModel?>,
     onBack: () -> Unit,
     onSaveUsage: (UsageEntryModel) -> Unit,
+    onDeleteUsage: (UsageEntryModel) -> Unit,
+    onSaveUsageAsTemplate: (UsageEntryModel) -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState()
     val coroutineScope = rememberCoroutineScope()
@@ -93,7 +95,9 @@ fun CardDetailScreen(
                     UsageEntryList(
                         modifier = Modifier.padding(top = 12.dp),
                         entries = card.data.usages,
-                        onClick = { sheetConfig = SheetConfig.EditUsage(it) }
+                        onClick = { sheetConfig = SheetConfig.EditUsage(it) },
+                        onDelete = onDeleteUsage,
+                        onSaveAsTemplate = onSaveUsageAsTemplate
                     )
                 }
 
@@ -145,6 +149,8 @@ private fun PreviewCardDetailScreen() {
         card = Resource.Success(PreviewData.gymCard),
         onBack = {},
         onSaveUsage = {},
+        onDeleteUsage = {},
+        onSaveUsageAsTemplate = {}
     )
 }
 
@@ -155,5 +161,7 @@ private fun PreviewCardDetailScreen_NoCard() {
         card = Resource.Success(null),
         onBack = {},
         onSaveUsage = {},
+        onDeleteUsage = {},
+        onSaveUsageAsTemplate = {}
     )
 }

@@ -4,8 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.schedler.amortify.domain.model.CardModel
 import dev.schedler.amortify.domain.model.UsageEntryModel
+import dev.schedler.amortify.domain.model.UsageTemplateModel
 import dev.schedler.amortify.domain.repository.CardRepository
 import dev.schedler.amortify.domain.repository.UsageEntryRepository
+import dev.schedler.amortify.domain.repository.UsageTemplateRepository
 import dev.schedler.amortify.presentation.util.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,6 +21,7 @@ class CardDetailViewModel(
     private val cardId: Uuid,
     private val cardRepository: CardRepository,
     private val usageEntryRepository: UsageEntryRepository,
+    private val usageTemplateRepository: UsageTemplateRepository,
 ) : ViewModel() {
 
     private val _card = MutableStateFlow<Resource<CardModel?>>(Resource.Loading)
@@ -51,6 +54,17 @@ class CardDetailViewModel(
     fun deleteUsage(id: Uuid) {
         viewModelScope.launch {
             usageEntryRepository.delete(id)
+        }
+    }
+
+    fun saveUsageAsTemplate(usage: UsageEntryModel) {
+        viewModelScope.launch {
+            val template = UsageTemplateModel(
+                id = null,
+                description = usage.description,
+                price = usage.price
+            )
+            usageTemplateRepository.insert(cardId, template)
         }
     }
 }
