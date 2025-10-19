@@ -21,14 +21,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,6 +34,8 @@ import dev.schedler.amortify.domain.model.UsageTemplateModel
 import dev.schedler.amortify.presentation.util.DateFormat
 import dev.schedler.amortify.presentation.util.PreviewData
 import dev.schedler.amortify.presentation.util.darken
+import dev.schedler.amortify.presentation.util.now
+import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -95,11 +94,25 @@ fun CardItemView(
                     color = Color.White,
                     fontSize = 16.sp
                 )
-                Text(
-                    text = DateFormat.fromTo(card.start, card.end),
-                    color = Color.White,
-                    fontSize = 14.sp
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = DateFormat.fromTo(card.start, card.end),
+                        color = Color.White,
+                        fontSize = 14.sp
+                    )
+                    if (showPercentage) {
+                        val daysUsed = LocalDate.now().toEpochDays() - card.start.toEpochDays() + 1
+                        val totalDays = card.end.toEpochDays() - card.start.toEpochDays() + 1
+                        Text(
+                            text = "${(daysUsed.toFloat() / totalDays * 100).toInt()}% ($daysUsed/$totalDays days)",
+                            color = Color.White,
+                            fontSize = 14.sp
+                        )
+                    }
+                }
             }
 
             val progressRowModifier = if (onAddUsage == null) {
@@ -117,10 +130,6 @@ fun CardItemView(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    val indicatorColor by derivedStateOf {
-                        val clampedProgress = card.progress.coerceIn(0f, 1f)
-                        lerp(Color.Red, Color.Green, clampedProgress)
-                    }
                     GradientProgressIndicator(
                         progress = card.progress,
                         modifier = Modifier
