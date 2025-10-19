@@ -11,7 +11,9 @@ fun UsageEntryEntity.toDomain(): UsageEntryModel = UsageEntryModel(
     price = price
 )
 
-fun List<UsageEntryEntity>.toDomain(): List<UsageEntryModel> = this.map(UsageEntryEntity::toDomain)
+fun List<UsageEntryEntity>.toDomain(): List<UsageEntryModel> = this
+    .sortedByDescending(UsageEntryEntity::dateTime)
+    .map(UsageEntryEntity::toDomain)
 
 fun UsageEntryModel.toEntity(cardId: Uuid) = UsageEntryEntity(
     id = id ?: Uuid.random(),
