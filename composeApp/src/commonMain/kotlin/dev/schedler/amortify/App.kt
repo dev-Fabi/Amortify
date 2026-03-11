@@ -23,7 +23,6 @@ import dev.schedler.amortify.presentation.cardlist.CardListViewModel
 import dev.schedler.amortify.presentation.navigation.Screen
 import dev.schedler.amortify.presentation.navigation.UuidNavType
 import dev.schedler.amortify.presentation.util.Resource
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.compose.KoinApplication
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -31,7 +30,6 @@ import kotlin.reflect.typeOf
 import kotlin.uuid.Uuid
 
 @Composable
-@Preview
 fun App(databaseBuilder: RoomDatabase.Builder<AmortifyDatabase>) {
     KoinApplication(application = {
         modules(

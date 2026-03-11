@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.schedler.amortify.domain.model.UsageEntryModel
 import dev.schedler.amortify.presentation.util.DateFormat
@@ -28,7 +29,6 @@ import dev.schedler.amortify.presentation.util.PreviewData
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.toLocalDateTime
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun UsageEntryItem(
